@@ -1,16 +1,30 @@
 # Scrabble Word Builder
 
-A C# .NET 8 console application that finds the highest-scoring valid Scrabble word formable from a player's rack letters, optionally combined with letters from a word already on the board.
+A C# .NET 10 console application that finds the highest-scoring valid Scrabble word formable from a player's rack letters, optionally combined with letters from a word already on the board.
 
 ## Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 
-Verify your installation:
+### Installing .NET 10 SDK
 
+**macOS (via Homebrew):**
+```
+brew install --cask dotnet-sdk
+```
+
+**macOS/Windows/Linux (direct download):**
+
+Download and run the installer from the official .NET download page:
+👉 https://dotnet.microsoft.com/en-us/download/dotnet/10.0
+
+Select your OS and architecture (use **Arm64** for Apple M1/M2/M3, **x64** for Intel).
+
+**Verify your installation:**
 ```
 dotnet --version
 ```
+Should print `10.x.x`.
 
 ## How to Build
 
