@@ -1,0 +1,13 @@
+# Build output
+bin/
+obj/
+
+# Rider/JetBrains IDE
+.idea/
+
+# Claude Code local settings
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
