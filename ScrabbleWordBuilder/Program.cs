@@ -4,6 +4,9 @@ namespace ScrabbleWordBuilder;
 
 class Program
 {
+    private static InputValidator? _validator;
+    private static WordFinder? _wordFinder;
+
     static int Main(string[] args)
     {
         // Locate the Data directory
@@ -27,36 +30,20 @@ class Program
             return 1;
         }
 
-        var validator = new InputValidator(letterData);
-        var wordFinder = new WordFinder(dataPath, letterData);
+        _validator = new InputValidator(letterData);
+        _wordFinder = new WordFinder(dataPath, letterData);
 
         string? rack = null;
         string? boardWord = null;
 
-        if (args.Length == 0)
+        if (args.Length > 0)
         {
-            // Interactive mode
-            Console.Write("Enter your rack letters (1-7 letters): ");
-            rack = Console.ReadLine()?.Trim();
-
-            Console.Write("Enter board word (optional, press Enter to skip): ");
-            string? boardInput = Console.ReadLine()?.Trim();
-            if (!string.IsNullOrWhiteSpace(boardInput))
-                boardWord = boardInput;
-        }
-        else
-        {
-            // CLI argument mode
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].Equals("--rack", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
-                {
                     rack = args[++i];
-                }
                 else if (args[i].Equals("--word", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
-                {
                     boardWord = args[++i];
-                }
             }
 
             if (string.IsNullOrWhiteSpace(rack))
@@ -66,34 +53,39 @@ class Program
             }
         }
 
-        // Validate input
-        var validation = validator.Validate(rack!, boardWord);
-        if (!validation.IsValid)
+        Console.WriteLine("Scrabble Word Builder — press Ctrl+C to exit.");
+        while (true)
         {
-            Console.WriteLine($"Invalid input: {validation.ErrorMessage}");
-            return 1;
-        }
+            Console.WriteLine();
 
-        // Find the best word
-        string? bestWord;
+            Console.Write("Enter your rack letters (1-7 letters): ");
+            string? newRack = Console.ReadLine()?.Trim();
+            if (!string.IsNullOrWhiteSpace(newRack))
+                rack = newRack;
+
+            Console.Write("Enter board word (optional, press Enter to skip): ");
+            string? newBoard = Console.ReadLine()?.Trim();
+            boardWord = string.IsNullOrWhiteSpace(newBoard) ? null : newBoard;
+
+            Console.WriteLine(ResolveWord(rack!, boardWord));
+        }
+    }
+
+    private static string ResolveWord(string rack, string? boardWord)
+    {
+        var validation = _validator!.Validate(rack, boardWord);
+        if (!validation.IsValid)
+            return $"Invalid input: {validation.ErrorMessage}";
+
         try
         {
-            bestWord = wordFinder.FindBestWord(rack!, boardWord);
+            string? bestWord = _wordFinder!.FindBestWord(rack, boardWord);
+            return bestWord == null ? "No valid word found." : bestWord.ToUpper();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error finding word: {ex.Message}");
-            return 1;
+            return $"Error finding word: {ex.Message}";
         }
-
-        if (bestWord == null)
-        {
-            Console.WriteLine("No valid word found.");
-            return 0;
-        }
-
-        Console.WriteLine(bestWord.ToUpper());
-        return 0;
     }
 
     private static string? FindDataDirectory()
